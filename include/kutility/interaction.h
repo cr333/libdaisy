@@ -161,7 +161,7 @@ namespace kutility
    /// sets the horizontal spacing of the number and "sep" is the
    /// seperation character of the numbers.
    template<class T> inline
-   void display( T** data, int r, int c=1,  bool no_zero=false, bool legend=false, int precision=3, int width=4, char* sep="\t")
+   void display( T** data, int r, int c=1,  bool no_zero=false, bool legend=false, int precision=3, int width=4, const char* sep="\t")
    {
       cout.width(width);
       cout.fill(' ');

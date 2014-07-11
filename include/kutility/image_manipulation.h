@@ -195,7 +195,7 @@ namespace kutility
          for( int  x=0; x<w; x++ )
          {
             int index = yw+x;
-            int cindex = 3*index;
+            //int cindex = 3*index;
 
             ch_0[index] = image[index  ];
             ch_1[index] = image[index+1];
