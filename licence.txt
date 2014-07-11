@@ -3,8 +3,8 @@ Software License Agreement (BSD License)
 
 Copyright (c) 2009
 Engin Tola
-web   : http://www.engintola.com
-email : engin.tola+libdaisy@gmail.com
+web   : http:cvlab.epfl.ch/~tola
+email : engin.tola@epfl.ch
 
 All rights reserved.
 

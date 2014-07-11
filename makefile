@@ -2,7 +2,7 @@
 packagename := daisy
 major_version := 1
 minor_version := 8
-tiny_version := 0
+tiny_version := 1
 author := Engin Tola
 description := daisy descriptor
 licence := see license.txt
@@ -47,32 +47,32 @@ endif
 
 ifeq ($(optimize),false)
   packagename := $(packagename)d
-  outdir := debug/
+  outdir := debug
 else
-  outdir := release/
+  outdir := release
 endif
 
-srcdir := ${srcdir}/
+# sources_list = $(sources)
+sources_list = $(addprefix $(srcdir)/, $(sources))
 
-sources_list = $(addprefix $(srcdir), $(sources))
+objectfiles       := $(filter %.o,$(subst   .c,.o,$(sources_list)))
+objectfiles       += $(filter %.o,$(subst  .cc,.o,$(sources_list)))
+objectfiles       += $(filter %.o,$(subst .cpp,.o,$(sources_list)))
 
-objectfiles       := $(filter %.o,$(subst   .c,.o,$(sources)))
-objectfiles       += $(filter %.o,$(subst  .cc,.o,$(sources)))
-objectfiles       += $(filter %.o,$(subst .cpp,.o,$(sources)))
-
-objects = $(addprefix $(outdir), $(objectfiles))
+objects = $(objectfiles)
+# objects = $(addprefix $(outdir)/, $(objectfiles))
 
 dependencies  := $(subst .o,.d,$(objects))
 
-depdir := $(dir ${dependencies})
+# dependencies := $(srcdir)'/'$(dependencies)
+# dependencies := $(subst $(srcdir), $(outdir), $(dependencies))
 
-bindir := ${outdir}'/bin/'
-libdir := ${outdir}${libdir}
+
 libname       := lib$(packagename)
 libtarget     := $(libdir)/$(libname).a
 libsoname     := $(libname).so.$(major_version)
 librealname   := $(libdir)/$(libname).so.$(version)
-exetarget     := ${bindir}$(packagename)
+exetarget     := $(packagename)
 pkgconfigfile := $(packagename).pc
 
 automakefile := make.auto
@@ -81,18 +81,14 @@ commentfile  := makefile.comment
 tag_file:=TAGS
 tag_generator:='$(MAKEFILE_HEAVEN)/tags.sh'
 tag_depends:=${external_libraries}
-tag_src := ${includedir}/*.h ${includedir}/${packagename}/*.h		\
-${includedir}/*.tcc ${includedir}/${packagename}/*.tcc ${srcdir}*.cpp	\
-${srcdir}*.cc $(srcdir)*.c
+tag_src := $(includedir)/*.h $(includedir)/$(packagename)/*.h		\
+$(includedir)/*.tcc $(includedir)/$(packagename)/*.tcc $(srcdir)/*.cpp	\
+$(srcdir)/*.cc $(srcdir)/*.c
 
 compiler := g++
-# compiler := colorgcc
 CXX := ${compiler}
 
 curpath=`pwd -P`
-
-REQUIRED_DIRS = ${outdir} ${libdir} ${depdir} ${bindir}
-
 ################################################################################
 ########################### - MAKEFILE FLAGS - #################################
 ################################################################################
@@ -100,17 +96,14 @@ REQUIRED_DIRS = ${outdir} ${libdir} ${depdir} ${bindir}
 ARFLAGS = ruv
 CTAGFLAGS := -e -R --languages=c++,c
 
-CXXFLAGS += -ffast-math  ${define_flags} -I$(includedir) ${custom_cflags}
+CXXFLAGS += ${define_flags} -I$(includedir) ${custom_cflags}
 LDFLAGS += ${custom_ld_flags}
 
 ifeq ($(optimize),false)
-  external_libraries := $(subst argus,argusd,$(external_libraries))
-  external_libraries := $(subst kutility,kutilityd,$(external_libraries))
-  external_libraries := $(subst kortex,kortexd,$(external_libraries))
-  external_libraries := $(subst karpet,karpetd,$(external_libraries))
-  external_libraries := $(subst daisy,daisyd,$(external_libraries))
-  external_libraries := $(subst evidence,evidenced,$(external_libraries))
-  external_libraries := $(subst kost,kostd,$(external_libraries))
+  external_libraries := $(subst kutility, kutilityd, $(external_libraries) )
+  external_libraries := $(subst kortex,   kortexd,   $(external_libraries) )
+  external_libraries := $(subst daisy,    daisyd,    $(external_libraries) )
+  external_libraries := $(subst evidence, evidenced, $(external_libraries) )
 endif
 
 ifneq ($(external_sources),)
@@ -126,13 +119,9 @@ ifeq ($(f77),true)
  LDFLAGS += -lg2c
 endif
 
-ifeq ($(boost-thread),true)
- LDFLAGS += -lboost_thread-mt
-endif
-
 ifeq ($(sse),true)
-    CXXFLAGS += -msse -msse4.2 -DWITH_SSE
-    CPPFLAGS += -msse -msse4.2 -DWITH_SSE
+    CXXFLAGS += -msse -msse2
+    CPPFLAGS += -msse -msse2
 endif
 
 CXXFLAGS += -fno-strict-aliasing -Wall -fPIC
@@ -146,9 +135,12 @@ ifeq ($(profile),true)
 endif
 
 dbg_flags = -g -DDEBUG
-opt_flags = -O3 -DHAVE_INLINE -DNDEBUG
-spc_flags = -march=$(platform) -mfpmath=sse
+opt_flags = -O3 -DHAVE_INLINE -DGSL_RANGE_CHECK_OFF -DNDEBUG
+spc_flags = '-march=$(platform)' -mfpmath=sse
 
+ifeq ($(parallelize),true)
+   CXXFLAGS += -fopenmp
+endif
 ifeq ($(optimize),true)
   CXXFLAGS += $(opt_flags)
   ifeq ($(specialize),true)
@@ -157,11 +149,6 @@ ifeq ($(optimize),true)
 else
   CXXFLAGS += ${dbg_flags}
   parallelize = false
-  profile = true
-endif
-
-ifeq ($(parallelize),true)
-   CXXFLAGS += -fopenmp
 endif
 
 is_debug := $(wildcard .debug)
@@ -182,8 +169,6 @@ endif
 ################################ - MAKEFILE RULES - ############################
 ################################################################################
 
-_MKDIRS := $(shell mkdir -p ${REQUIRED_DIRS})
-
 .PHONY       : $(exetarget)
 $(exetarget) : ${objects}
 	@echo compiler path = ${compiler}
@@ -192,46 +177,6 @@ $(exetarget) : ${objects}
 	@echo
 	$(compiler) $(CXXFLAGS) $^ $(LDFLAGS) -o $@
 
-.PHONY : flags
-flags :
-	@echo
-	@echo ------------------ build flags
-	@echo
-	@echo ldflags  = $(LDFLAGS)
-	@echo
-	@echo cxxflags = $(CXXFLAGS)
-	@echo
-	@echo source_list = ${sources_list}
-	@echo
-	@echo objects = ${objects}
-	@echo
-	@echo dependencies = ${dependencies}
-	@echo depdir = ${depdir}
-
-.PHONY : internal_var
-internal_var :
-	@echo {curpath}       ${curpath}
-	@echo {compiler}      ${compiler}
-	@echo {CXX}           ${CXX}
-	@echo {libname}       ${libname}
-	@echo {libtarget}     ${libtarget}
-	@echo {libsoname}     ${libsoname}
-	@echo {librealname}   ${librealname}
-	@echo {exetarget}     ${exetarget}
-	@echo {pkgconfigfile} ${pkgconfigfile}
-	@echo {automakefile}  ${automakefile}
-	@echo {commentfile}   ${commentfile}
-	@echo {tag_file}      ${tag_file}
-	@echo {tag_generator} ${tag_generator}
-	@echo {tag_depends}   ${tag_depends}
-	@echo {tag_src}       ${tag_src}
-	@echo
-	@echo ldflags  = $(LDFLAGS)
-	@echo cxxflags = $(CXXFLAGS)
-	@echo source_list = ${sources_list}
-	@echo objects = ${objects}
-	@echo dependencies = ${dependencies}
-	@echo
 
 .PHONY : compilation
 compilation:
@@ -305,12 +250,7 @@ cleandist  :
 	@echo
 	@echo ------------------ cleaning everything
 	@echo
-	@rm -f $(pkgconfigfile) $(libtarget) $(objects) ${exetarget} $(dependencies) $(tag_file) gmon.out  $(librealname) $(libdir)/$(libname).so $(libdir)/$(libsoname)
-
-.PHONY   : cleandep
-cleandep :
-	@echo ------------------ cleaning dependencies
-	@rm -rf ${dependencies}
+	@rm -f $(pkgconfigfile) $(libtarget) $(packagename) $(objects) ${exetarget} $(dependencies) $(tag_file) gmon.out  $(librealname) $(libdir)/$(libname).so $(libdir)/$(libsoname)
 
 .PHONY : clear
 clear :
@@ -404,8 +344,8 @@ pkgfile:
 	@echo Name: "$(packagename)" 			>> $(pkgconfigfile)
 	@echo Description: "$(description)" 		>> $(pkgconfigfile)
 	@echo Version: "$(version)"                     >> $(pkgconfigfile)
-	@echo Libs: -L$$\{libdir} -l$(packagename) ${custom_ld_flags}	>> $(pkgconfigfile)
-	@echo Cflags: -I$$\{includedir\} ${define_flags} ${custom_cflags}  >> $(pkgconfigfile)
+	@echo Libs: -L$$\{libdir} -l$(packagename) 	>> $(pkgconfigfile)
+	@echo Cflags: -I$$\{includedir\} ${define_flags}>> $(pkgconfigfile)
 	@echo Requires: ${external_libraries}           >> $(pkgconfigfile)
 	@echo Path=$(curpath)                           >> $(pkgconfigfile)
 	@echo tagfile=$$\{Path\}/$(tag_file)            >> $(pkgconfigfile)
@@ -453,15 +393,28 @@ export :
 	@mv makefile makefile.in
 	@mv ${automakefile} makefile
 
+.PHONY : flags
+flags :
+	@echo
+	@echo ------------------ build flags
+	@echo
+	@echo ldflags  = $(LDFLAGS)
+	@echo
+	@echo cxxflags = $(CXXFLAGS)
+	@echo
+	@echo source_list = ${sources_list}
+	@echo
+	@echo objects = ${objects}
+	@echo
+	@echo dependencies = ${dependencies}
+
 .PHONY : gflat
 gflat :
-	@echo "gprof $(exetarget) gmon.out -p | more"
-	@gprof $(exetarget) gmon.out -p | more
+	@gprof $(packagename) gmon.out -p | more
 
 .PHONY : gcall
 gcall :
-	@echo "gprof $(exetarget) gmon.out -q | more"
-	@gprof $(exetarget) gmon.out -q | more
+	@gprof $(packagename) gmon.out -q | more
 
 .PHONY : state
 state  :
@@ -503,7 +456,6 @@ rules :
 	@echo "clear       : cleans up *~ #* and dependencies"
 	@echo "clean       : cleans up .o lib and exe files"
 	@echo "cleanaux    : cleans auxilary files: *.o *.d"
-	@echo "cleandep    : cleans up the dependency files"
 	@echo "cleandox    : cleans up the documentation"
 	@echo "cleandist   : cleans everything except source+headers"
 	@echo "install     : installs the executable"
@@ -520,43 +472,35 @@ rules :
 	@echo "revert      : moves makefile.in to makefile"
 	@echo
 
-${outdir}%.d : ${srcdir}%.c
+%.d : %.c
 	@echo
 	@echo ------------------ creating dependencies for $@
 	@echo
-	$(compiler) $(CXXFLAGS) $(TARGET_ARCH) -MM $< | sed 's,\($(notdir $*)\.o\) *:,$(dir $@)\1 $@: ,' > $@.tmp
+	$(compiler) $(CXXFLAGS) $(TARGET_ARCH) -MM $< | \
+	sed 's,\($(notdir $*)\.o\) *:,$(dir $@)\1 $@: ,' > $@.tmp
 	mv -f $@.tmp $@
 	@echo
 
-${outdir}%.d : ${srcdir}%.cc
+%.d : %.cc
 	@echo
 	@echo ------------------ creating dependencies for $@
 	@echo
-	$(compiler) $(CXXFLAGS) $(TARGET_ARCH) -MM $< | sed 's,\($(notdir $*)\.o\) *:,$(dir $@)\1 $@: ,' > $@.tmp
+	$(compiler) $(CXXFLAGS) $(TARGET_ARCH) -MM $< | \
+	sed 's,\($(notdir $*)\.o\) *:,$(dir $@)\1 $@: ,' > $@.tmp
 	mv -f $@.tmp $@
 	@echo
 
-${outdir}%.d : ${srcdir}%.cpp
+%.d : %.cpp
 	@echo
 	@echo ------------------ creating dependencies for $@
 	@echo
-	$(compiler) $(CXXFLAGS) $(TARGET_ARCH) -MM $< | sed 's,\($(notdir $*)\.o\) *:,$(dir $@)\1 $@: ,' > $@.tmp
+	$(compiler) $(CXXFLAGS) $(TARGET_ARCH) -MM $< | \
+	sed 's,\($(notdir $*)\.o\) *:,$(dir $@)\1 $@: ,' > $@.tmp
 	mv -f $@.tmp $@
 	@echo
-
-${outdir}%.o : ${srcdir}%.cpp
-	$(CXX) $(CXXFLAGS) -c $< -o $@
-
-${outdir}%.o : ${srcdir}%.c
-	$(CXX) $(CXXFLAGS) -c $< -o $@
-
-${outdir}%.o : ${srcdir}%.cc
-	$(CXX) $(CXXFLAGS) -c $< -o $@
-
 
 ifneq "$(MAKECMDGOALS)" "clean"
   include $(dependencies)
 endif
-
 
 

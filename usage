@@ -8,8 +8,8 @@ Engin Tola
 
 CONTACT:
 
-web   : http://www.engintola.com
-email : engintola+libdaisy@gmail.com
+web   : http://cvlab.epfl.ch/~tola
+email : engin.tola@epfl.ch
 
 --------------------------------------------------------------------------------
 
@@ -24,34 +24,21 @@ CONTEXT
 DAISY is a local image descriptor designed for dense wide-baseline matching
 purposes. For more details about the descriptor please read the papers:
 
-@article{Tola10,
-  author = "E. Tola and V. Lepetit and P. Fua",
-  title = {{DAISY: An Efficient Dense Descriptor Applied to Wide Baseline Stereo}},
-  journal = "IEEE Transactions on Pattern Analysis and Machine Intelligence",
-  year = 2010,
-  month = "May",
-  pages = "815--830",
-  volume = "32",
-  number = "5"
-}
+'A fast local descriptor for dense matching' from
+http://cvlab/~tola/publications.html#daisy
 
-AND
+and
 
-@inproceedings{Tola08,
-  author = "E. Tola and V.Lepetit and P. Fua",
-  title = {{A Fast Local Descriptor for Dense Matching}},
-  booktitle = "Proceedings of Computer Vision and Pattern Recognition",
-  year = 2008,
-  address = "Alaska, USA"
-}
+'Daisy: An efficient dense descriptor applied to wide baseline stereo' from
+http://cvlab/~tola/publications.html#daisy-pami
 
 --------------------------------------------------------------------------------
 
 SOFTWARE
 
-There is a main.cpp file under ./src/ directory as an example code. You can
+There's a main.cpp file under ./src/ directory for an example code. You can
 inspect it on how to use the daisy class. However, this software is intended to
-be used as a library and has additional operation modes in that form.
+be used as a library and has more various operation modes in that form.
 
 1. To build the example application code run
 
@@ -95,7 +82,7 @@ pkg-config utility and if you don't have pkg-config you should either install it
 or change the makefile accordingly. To enable opencv, uncomment the
 'define_flags' and 'external_library' lines in the makefile.
 
-4. To enable debugging for the library change the 'optimize=true' to
+4. To enable debugging for the library change the 'optimize = true' to
 'optimize=false' in the makefile.
 
 5. Library can be compiled with OpenMP[4] for parallel processing. To enable
