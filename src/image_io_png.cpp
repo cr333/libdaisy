@@ -111,7 +111,7 @@ namespace kutility
       w  = png_get_image_width(png_ptr, info_ptr);
       ch = png_get_channels(png_ptr, info_ptr);
 
-      int rb = png_get_rowbytes(png_ptr, info_ptr);
+      size_t rb = png_get_rowbytes(png_ptr, info_ptr);
 
       body = new uchar[h*rb];
       for( int y=0; y<h; y++ )

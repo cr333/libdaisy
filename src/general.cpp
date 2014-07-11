@@ -98,7 +98,7 @@ namespace kutility
    {
       if ( !szT )                 // handle null passed strings.
          return NULL;
-      int i = strlen(szT);
+      int i = (int)strlen(szT);
       int t = !(i%2)? 1 : 0;      // check the length of the string .
       for(int j = i-1 , k = 0 ; j > (i/2 -t) ; j-- )
       {

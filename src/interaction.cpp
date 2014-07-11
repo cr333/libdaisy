@@ -88,7 +88,7 @@ namespace kutility
    {
       string str = str1 + " " + str2 + " " + str3;
 
-      int length = str.length();
+      size_t length = str.length();
 
       if( length > 140 ) length = 140;
 
