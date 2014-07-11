@@ -744,7 +744,7 @@ namespace kutility
       fclose(pFile);
    }
 
-#if !defined(WIN32)
+#if !defined(WIN32) && HAVE_MMAP64
    /// to deallocate call munmap( (void*)mapped_file, size * sizeof(T) )
    template<typename T> inline
    void map_memory_file(string memory_file, long int size, T* &mapped_file)
