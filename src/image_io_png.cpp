@@ -1,9 +1,22 @@
 #ifdef WITH_PNG
 
+#include <zlib.h>
 #include "kutility/image_io_png.h"
 
 #ifndef png_jmpbuf
 #  define png_jmpbuf(png_ptr) ((png_ptr)->jmpbuf)
+#endif
+
+#ifndef png_infopp_NULL
+#  define png_infopp_NULL (png_infopp)NULL
+#endif
+
+#ifndef int_p_NULL
+#  define int_p_NULL (int*)NULL
+#endif
+
+#ifndef png_voidp_NULL
+#  define png_voidp_NULL (png_voidp)NULL
 #endif
 
 namespace kutility
@@ -90,7 +103,7 @@ namespace kutility
       wpng_info.gamma = 0.0;
       wpng_info.channel_no = chl;
 
-      ulong rowbytes;
+      long rowbytes;
       int rc;
       int error = 0;
 

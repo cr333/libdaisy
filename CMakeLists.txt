@@ -28,6 +28,14 @@ if (OPENMP_FOUND)
   endif (USE_OPENMP)
 endif (OPENMP_FOUND)
 
+OPTION(WITH_PNG "Enable PNG input/output using libpng." OFF)
+if(WITH_PNG)
+	find_package(PNG)
+	add_definitions(-DWITH_PNG)
+	include_directories(${PNG_PNG_INCLUDE_DIR} ${ZLIB_INCLUDE_DIR})
+	SET(EXTRA_LIBS "${PNG_LIBRARIES};${EXTRA_LIBS}")
+endif()
+
 include_directories(include)
 
 # Make the headers appear in IDEs.
@@ -47,6 +55,7 @@ set(daisy_srcs
 )
 
 add_library(daisy ${daisy_srcs} ${daisy_hdrs})
+target_link_libraries(daisy ${EXTRA_LIBS})
 
 ADD_EXECUTABLE(main_daisy src/main.cpp)
 TARGET_LINK_LIBRARIES(main_daisy daisy)
