@@ -18,14 +18,14 @@ else()
     message("System hasn't large file support.")
 endif()
 
-#Detect OpenMP
+# Detect OpenMP
 FIND_PACKAGE(OpenMP) 
-if (OPENMP_FOUND) 
-  SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
+if (OPENMP_FOUND)
   option(USE_OPENMP "Use OpenMP for parallelization" ON)
-  add_definitions(-DUSE_OPENMP)
-else(OPENMP_FOUND)
-  option(USE_OPENMP "Use OpenMP for parallelization" OFF)
+  if (USE_OPENMP)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
+    add_definitions(-DUSE_OPENMP)
+  endif (USE_OPENMP)
 endif (OPENMP_FOUND)
 
 include_directories(include)
