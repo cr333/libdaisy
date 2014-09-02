@@ -131,7 +131,7 @@ MODE 2. You can also precompute orientation layers with
 
 a) get the descriptor at floating point locations with any orientation as
 
-   float* thor = new thor[desc->descriptor_size()];
+   float* thor = new float[desc->descriptor_size()];
 
    desc->get_descriptor(y,x,orientation,thor); // returns normalized descriptor
 
@@ -145,14 +145,14 @@ a) get the descriptor at floating point locations with any orientation as
 
 b) or get the descriptor with a warped grid
 
-   float* thor = new thor[desc->descriptor_size()];
+   float* thor = new float[desc->descriptor_size()];
    desc->get_descriptor(y,x,orientation, H, thor);
 
    here H (float H[9]) is a homography matrix used to warp the grid of daisy and
    (y,x) is on the unwarped image. You can use this function in the case where
    you have two images and you want to compare the descriptors of two
    corresponding points which are related with a planar transformation. The
-   transformation is encoded with a Homography matrix.
+   transformation is encoded with a homography matrix.
 
    orientation in [0 360)
 
@@ -173,7 +173,7 @@ function (a), as per its name, returns an unnormalized descriptor and function
 (b) returns the normalized descriptor.
 
 You can call set_normalization() function with NRM_PARTIAL, NRM_FULL and
-NRM_SIFT flags to change the applied normalization algoritm. For example,
+NRM_SIFT flags to change the applied normalization algorithm. For example,
 
    desc->set_normalization(NRM_SIFT);
    desc->get_descriptor(y,x,orientation,thor);
@@ -192,7 +192,7 @@ which is equivalent to
 set_normalization() function changes the used algorithm globally whereas you can
 apply individual normalizations using normalize_descriptor() function.
 
-The default algorith is NRM_PARTIAL. Possibilities are:
+The default algorithm is NRM_PARTIAL. Possibilities are:
 
 NRM_PARTIAL: Each histogram is normalized independently so that their L2 norm is 1.
 NRM_FULL   : The whole descriptor is normalized so that its L2 norm is 1.
