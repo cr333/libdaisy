@@ -500,19 +500,12 @@ inline void daisy::bi_get_histogram( float* histogram, double y, double x, int s
    int mnx = int( x );
    int mny = int( y );
 
-   if( mnx >= m_w-2  || mny >= m_h-2 )
-   {
-      memset(histogram, 0, sizeof(float)*m_hist_th_q_no);
-      return;
-   }
-
-   int ind =  mny*m_w+mnx;
-   // A C --> pixel positions
+   // A C --> pixel positions (clamped to boundary)
    // B D
-   float* A = hcube+ind*m_hist_th_q_no;
-   float* B = A+m_w*m_hist_th_q_no;
-   float* C = A+m_hist_th_q_no;
-   float* D = A+(m_w+1)*m_hist_th_q_no;
+   float* A = hcube + (mny * m_w + mnx) * m_hist_th_q_no;
+   float* B = A + (mny + 1 < m_h ? m_w * m_hist_th_q_no : 0);
+   float* C = A + (mnx + 1 < m_w ?       m_hist_th_q_no : 0);
+   float* D = B + (mnx + 1 < m_w ?       m_hist_th_q_no : 0);
 
    double alpha = mnx+1-x;
    double beta  = mny+1-y;
