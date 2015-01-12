@@ -58,6 +58,8 @@ set(daisy_srcs
 add_library(daisy ${daisy_srcs} ${daisy_hdrs})
 target_link_libraries(daisy ${EXTRA_LIBS})
 
-ADD_EXECUTABLE(main_daisy src/main.cpp)
-TARGET_LINK_LIBRARIES(main_daisy daisy)
-
+option(DAISY_BUILD_MAIN "Build the libdaisy example application." OFF)
+if(DAISY_BUILD_MAIN)
+    ADD_EXECUTABLE(main_daisy src/main.cpp)
+    TARGET_LINK_LIBRARIES(main_daisy daisy)
+endif(DAISY_BUILD_MAIN)
