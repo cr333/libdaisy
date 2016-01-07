@@ -13,10 +13,10 @@ IF (UNIX OR APPLE)
 ENDIF ()
 
 if(HAVE_MMAP64)
-    message("System has large file support.")
+    message(STATUS "System has large file support.")
     add_definitions(-DHAVE_MMAP64)
 else()
-    message("System hasn't large file support.")
+    message(STATUS "System hasn't large file support.")
 endif()
 
 # Detect OpenMP
